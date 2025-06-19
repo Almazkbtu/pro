@@ -1,0 +1,33 @@
+{% extends 'parking/base.html' %}
+{% load static %}
+
+{% block title %}Оплата парковки - Умная парковка{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white text-center">
+            <h4 class="mb-0">Оплата парковки</h4>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="license_plate" class="form-label">Номер автомобиля</label>
+                    <input type="text" class="form-control" id="license_plate" name="license_plate" placeholder="A123BC" required>
+                </div>
+                <div class="mb-3">
+                    <label for="hours" class="form-label">Количество часов</label>
+                    <input type="number" class="form-control" id="hours" name="hours" min="1" max="24" value="1" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Оплатить</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,55 @@
+{% extends 'parking/base.html' %}
+
+{% block title %}Управление шлагбаумом - Умная парковка{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Управление шлагбаумом</h3>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <button type="button" class="btn btn-success btn-lg" onclick="controlBarrier('open')">
+                            Открыть шлагбаум
+                        </button>
+                        <button type="button" class="btn btn-danger btn-lg" onclick="controlBarrier('close')">
+                            Закрыть шлагбаум
+                        </button>
+                        <a href="{% url 'parking:home' %}" class="btn btn-secondary">Вернуться на главную</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function controlBarrier(action) {
+    fetch('{% url "parking:control_barrier" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            action: action
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Шлагбаум ' + (action === 'open' ? 'открыт' : 'закрыт'));
+        } else {
+            alert('Ошибка: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Ошибка при выполнении операции');
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %} 

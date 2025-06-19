@@ -1,0 +1,86 @@
+{% extends 'parking/base.html' %}
+
+{% block title %}Месячный отчет - Умная парковка{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Месячный отчет</h3>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="month">Выберите месяц:</label>
+                                    <input type="month" class="form-control" id="month" name="month" value="{{ month|date:'Y-m' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary d-block">Показать</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Общая статистика</h5>
+                                    <p>Всего мест: {{ total_spots }}</p>
+                                    <p>Средняя загрузка: {{ avg_occupancy }}%</p>
+                                    <p>Максимальная загрузка: {{ max_occupancy }}%</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Финансы</h5>
+                                    <p>Общая выручка: {{ total_revenue }} руб.</p>
+                                    <p>Количество оплат: {{ total_payments }}</p>
+                                    <p>Средний чек: {{ avg_payment }} руб.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4>Ежедневная статистика</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Выручка</th>
+                                    <th>Количество оплат</th>
+                                    <th>Средняя загрузка</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for day in daily_stats %}
+                                <tr>
+                                    <td>{{ day.date|date:"d.m.Y" }}</td>
+                                    <td>{{ day.revenue }} руб.</td>
+                                    <td>{{ day.payments }}</td>
+                                    <td>{{ day.occupancy }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-3">
+                        <a href="{% url 'parking:home' %}" class="btn btn-secondary">Вернуться на главную</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

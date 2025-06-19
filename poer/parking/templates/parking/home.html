@@ -1,0 +1,119 @@
+{% extends 'parking/base.html' %}
+{% load static %}
+
+{% block title %}Главная - Умная парковка{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Список парковочных мест -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Парковочные места</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-md-2 g-2">
+                        {% for spot in spots %}
+                            <div class="col">
+                                <div class="card h-100 {% if spot.is_available %}border-success{% else %}border-danger{% endif %}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Место {{ spot.number }}</h5>
+                                        <p class="card-text">
+                                            {% if spot.is_available %}
+                                                <span class="badge bg-success">Свободно</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Занято</span>
+                                                {% if spot.current_car %}
+                                                    <br>
+                                                    <small class="text-muted">{{ spot.current_car.license_plate }}</small>
+                                                {% endif %}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Вкладки (Оплата и Бронирование) -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Управление парковкой</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pay-tab" data-bs-toggle="tab" data-bs-target="#pay" type="button" role="tab" aria-controls="pay" aria-selected="true">Оплата</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="reserve-tab" data-bs-toggle="tab" data-bs-target="#reserve" type="button" role="tab" aria-controls="reserve" aria-selected="false">Бронирование</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3" id="myTabContent">
+                        <!-- Вкладка Оплата -->
+                        <div class="tab-pane fade show active" id="pay" role="tabpanel" aria-labelledby="pay-tab">
+                            <form method="post" action="{% url 'parking:pay' %}" novalidate>
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="license_plate" class="form-label">Номер автомобиля</label>
+                                    <input type="text" class="form-control" id="license_plate" name="license_plate" placeholder="A123BC" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="hours" class="form-label">Количество часов</label>
+                                    <input type="number" class="form-control" id="hours" name="hours" min="1" max="24" value="1" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Оплатить</button>
+                            </form>
+                        </div>
+                        <!-- Вкладка Бронирование -->
+                        <div class="tab-pane fade" id="reserve" role="tabpanel" aria-labelledby="reserve-tab">
+                            <form method="post" action="{% url 'parking:reserve' %}" novalidate>
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="spot" class="form-label">Выберите место</label>
+                                    <select class="form-select" id="spot" name="spot" required>
+                                        <option value="" disabled selected>-- Выберите --</option>
+                                        {% for spot in spots %}
+                                            <option value="{{ spot.id }}">{{ spot.number }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="license_plate_reserve" class="form-label">Номер автомобиля</label>
+                                    <input type="text" class="form-control" id="license_plate_reserve" name="license_plate" placeholder="A123BC" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="start_time" class="form-label">Начало бронирования</label>
+                                    <input type="datetime-local" class="form-control" id="start_time" name="start_time" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="end_time" class="form-label">Окончание бронирования</label>
+                                    <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">Забронировать</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Статистика -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Статистика</h4>
+                </div>
+                <div class="card-body">
+                    <p>Всего мест: {{ total_spots }}</p>
+                    <p>Доступно: {{ available_spots }}</p>
+                    <p>Занято: {{ occupied_spots }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
